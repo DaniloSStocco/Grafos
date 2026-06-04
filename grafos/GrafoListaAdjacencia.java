@@ -1,52 +1,56 @@
 package grafos;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class GrafoListaAdjacencia extends Grafo{
     List<VerticeLista> vertices = new ArrayList<>();
 
+    public GrafoListaAdjacencia(){
+
+    }
+
     public void adicionarVertice(String vertice){
-        vertices.add(new VerticeLista(vertice));
-        nVertices++;
+        if(!existeVertice(vertice)){
+            vertices.add(new VerticeLista(vertice));
+            nVertices++;
+        }
     }
 
     public void removerVertice(String vertice){
         for (VerticeLista v : vertices) {
-            if(v.ligacoes.contains(vertice)){
-                v.ligacoes.remove(vertice);
-            }
-            if(v.getNome().equals(vertice)){
-                vertices.remove(v);
-            }
+            v.ligacoes.remove(vertice); 
         }
+
+        vertices.removeIf(v -> v.getNome().equals(vertice));
     }
 
     public void adicionarAresta(String origem, String destino){
-        if(nVertices>1){
-            for (VerticeLista v : vertices) {
-                if(v.getNome().equals(origem)){
-                    v.ligacoes.add(destino);
-                }
-                if(v.getNome().equals(destino)){
-                    v.ligacoes.add(origem);
-                    nArestas++;
-                }
+        adicionarVertice(origem);
+        adicionarVertice(destino);
+        
+        for (VerticeLista v : vertices) {
+            if(v.getNome().equals(origem)){
+                v.ligacoes.add(destino);
+            }
+            if(v.getNome().equals(destino)){
+                v.ligacoes.add(origem);
+                nArestas++;
             }
         }
         
     }
 
     public void removerAresta(String origem, String destino){
-        if(nVertices>1){
-            for (VerticeLista v : vertices) {
-                if(v.getNome().equals(origem)){
-                    v.ligacoes.remove(destino);
-                }
-                if(v.getNome().equals(destino)){
-                    v.ligacoes.remove(destino);
-                    nArestas--;
-                }
+        
+        for (VerticeLista v : vertices) {
+            if(v.getNome().equals(origem)){
+                v.ligacoes.remove(destino);
+            }
+            if(v.getNome().equals(destino)){
+                v.ligacoes.remove(destino);
+                nArestas--;
             }
         }
     }
@@ -79,14 +83,21 @@ public class GrafoListaAdjacencia extends Grafo{
     }
 
     public String toString(){
-        String saida = "Lista de Adjacencia\n"+
-                       "graph {\n\t";
+        List<String> verticesJaLidos = new ArrayList<>();
+
+        String saida = "Lista de Adjacencia\n"+ 
+                       "graph {";
+        this.vertices.sort(Comparator.comparing(VerticeLista::getNome));
         for (VerticeLista v : vertices) {
+            v.ligacoes.sort(null);
             for (String ligado : v.ligacoes) {
-                saida += ("\""+v.getNome()+"\" -- \""+ligado);
+                if(!verticesJaLidos.contains(ligado))
+                    saida += ("\n\t\""+v.getNome()+"\" -- \""+ligado+"\";");
             }
-            
+            verticesJaLidos.add(v.getNome());
         }
+        saida += "\n}\n";
+
         return saida;
     }
 }

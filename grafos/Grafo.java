@@ -4,6 +4,10 @@ public abstract class Grafo {
     int nVertices = 0;
     int nArestas = 0;
 
+    /**
+     * Adiciona um vértice avulso, pelo nome, no grafo.
+     * @param vertice O nome do vértice via String
+     */
     public abstract void adicionarVertice(String vertice);
 
     public abstract void removerVertice(String vertice);
