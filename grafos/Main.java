@@ -18,15 +18,23 @@ public class Main {
         String comando;
         String[] partes;
         
-        do{
+        while (sc.hasNextLine()) {
             comando = sc.nextLine();
             partes = comando.split(" ");
-            if(partes[0].equals("i")){
+            if(partes[0].equals("i"))
+            {
                 GLista.adicionarAresta(partes[1], partes[2]);
                 GMatriz.adicionarAresta(partes[1], partes[2]);
-                GPMatriz.adicionarAresta(partes[1], partes[2]);
+                
+                if(partes.length == 4) { // Se o usuário digitou o peso
+                    int peso = Integer.parseInt(partes[3]);
+                    GPMatriz.adicionarAresta(partes[1], partes[2], peso);
+                } else {
+                    GPMatriz.adicionarAresta(partes[1], partes[2]);
+                }
             }
-            if(partes[0].equals("r")){
+        
+            if(partes[0].equals("d")){
                 if(partes.length == 2){
                     GLista.removerVertice(partes[1]);
                     GMatriz.removerVertice(partes[1]);
@@ -44,7 +52,7 @@ public class Main {
                 System.out.print(GPMatriz.toString());
             }
 
-        }while(!comando.contentEquals(""));
+        }
     }
 
     

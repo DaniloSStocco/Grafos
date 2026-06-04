@@ -1,16 +1,14 @@
 package grafos;
-
+import java.util.Collections;
+import java.util.List;
 import java.util.ArrayList;
 
 public class GrafoPonderadoMatrizAdjacencia extends Grafo {
     
-    // Lista tradutora: O índice do elemento aqui dita a linha/coluna na matriz
     private ArrayList<String> listaVertices;
     
-    // Matriz dinâmica: Guarda o PESO da aresta. O valor 0 significa "Sem Aresta"
     private ArrayList<ArrayList<Integer>> matriz;
 
-    // Construtor
     public GrafoPonderadoMatrizAdjacencia() {
         this.listaVertices = new ArrayList<>();
         this.matriz = new ArrayList<>();
@@ -25,14 +23,12 @@ public class GrafoPonderadoMatrizAdjacencia extends Grafo {
         int novoIndice = listaVertices.size();
         listaVertices.add(vertice);
 
-        // Adiciona nova linha com 0s
         ArrayList<Integer> novaLinha = new ArrayList<>();
         for (int i = 0; i <= novoIndice; i++) {
             novaLinha.add(0);
         }
         matriz.add(novaLinha);
 
-        // Adiciona nova coluna (um 0 no final de cada linha existente)
         for (int i = 0; i < novoIndice; i++) {
             matriz.get(i).add(0);
         }
@@ -55,22 +51,21 @@ public class GrafoPonderadoMatrizAdjacencia extends Grafo {
         }
     }
 
-    // ---------------------------------------------------------
-    // NOVO MÉTODO (SOBRECARGA) - Exclusivo para adicionar com peso
-    // ---------------------------------------------------------
+
     public void adicionarAresta(String origem, String destino, int peso) {
+        // SOLUÇÃO: Garante que os vértices existem na matriz antes de ligá-los
+        adicionarVertice(origem);
+        adicionarVertice(destino);
+
         int idxOrigem = listaVertices.indexOf(origem);
         int idxDestino = listaVertices.indexOf(destino);
 
         if (idxOrigem != -1 && idxDestino != -1) {
-            matriz.get(idxOrigem).set(idxDestino, peso); // Ida
-            matriz.get(idxDestino).set(idxOrigem, peso); // Volta (Não direcionado)
+            matriz.get(idxOrigem).set(idxDestino, peso); 
+            matriz.get(idxDestino).set(idxOrigem, peso); 
         }
     }
 
-    // ---------------------------------------------------------
-    // MÉTODO DA CLASSE MÃE (SOBRESCRITA) - Mantém a compatibilidade
-    // ---------------------------------------------------------
     @Override   
     public void adicionarAresta(String origem, String destino) {
         // Se a classe mãe pedir para adicionar, usamos um peso padrão (ex: 1)
@@ -83,7 +78,7 @@ public class GrafoPonderadoMatrizAdjacencia extends Grafo {
         int idxDestino = listaVertices.indexOf(destino);
 
         if (idxOrigem != -1 && idxDestino != -1) {
-            matriz.get(idxOrigem).set(idxDestino, 0); // 0 indica corte da conexão
+            matriz.get(idxOrigem).set(idxDestino, 0);
             matriz.get(idxDestino).set(idxOrigem, 0); 
         }
     }
@@ -99,7 +94,6 @@ public class GrafoPonderadoMatrizAdjacencia extends Grafo {
         int idxDestino = listaVertices.indexOf(destino);
 
         if (idxOrigem != -1 && idxDestino != -1) {
-            // Retorna true apenas se o valor for diferente de 0 (peso vazio)
             return matriz.get(idxOrigem).get(idxDestino) != 0;
         }
         return false;
@@ -113,8 +107,6 @@ public class GrafoPonderadoMatrizAdjacencia extends Grafo {
         }
 
         int contagemGrau = 0;
-        // O grau é o número de conexões incidentes, independente do peso delas.
-        // Logo, contamos quantas células na linha são diferentes de zero.
         for (Integer pesoAresta : matriz.get(indice)) {
             if (pesoAresta != 0) {
                 contagemGrau++;
@@ -125,29 +117,52 @@ public class GrafoPonderadoMatrizAdjacencia extends Grafo {
 
     @Override   
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Ponderado - Matriz de Adjacencia\n");
-        sb.append("graph {\n");
+        List<String> linhas = new ArrayList<>();
+        boolean[] temAresta = new boolean[listaVertices.size()];
 
         for (int i = 0; i < matriz.size(); i++) {
-            // Inicia o 'j' igual a 'i' pelo mesmo motivo (evitar duplicatas)
             for (int j = i; j < matriz.get(i).size(); j++) {
                 
                 int peso = matriz.get(i).get(j);
                 
-                if (peso != 0) { // Diferente de 0 significa que a aresta existe
-                    sb.append("    \"")
-                      .append(listaVertices.get(i))
-                      .append("\" -- \"")
-                      .append(listaVertices.get(j))
-                      .append("\" [label=\"")
-                      .append(peso)
-                      .append("\"];\n");
+                if (peso != 0) { 
+                    temAresta[i] = true;
+                    temAresta[j] = true;
+                    
+                    String v1 = listaVertices.get(i);
+                    String v2 = listaVertices.get(j);
+                    
+                    // Ordena a dupla de vértices (Menor -- Maior)
+                    if (v1.compareTo(v2) > 0) {
+                        String temp = v1;
+                        v1 = v2;
+                        v2 = temp;
+                    }
+                    
+                    linhas.add("    \"" + v1 + "\" -- \"" + v2 + "\" [label=\"" + peso + "\"];");
                 }
             }
         }
         
+        // Adiciona os vértices isolados
+        for (int i = 0; i < listaVertices.size(); i++) {
+            if (!temAresta[i]) {
+                linhas.add("    \"" + listaVertices.get(i) + "\";");
+            }
+        }
+
+        // Ordena tudo alfabeticamente
+        Collections.sort(linhas);
+
+        // Monta o texto
+        StringBuilder sb = new StringBuilder();
+        sb.append("Ponderado - Matriz de Adjacencia\n");
+        sb.append("graph {\n");
+        for (String linha : linhas) {
+            sb.append(linha).append("\n");
+        }
         sb.append("}\n");
+        
         return sb.toString();
     }
 }

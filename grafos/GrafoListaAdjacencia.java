@@ -29,7 +29,6 @@ public class GrafoListaAdjacencia extends Grafo{
     public void adicionarAresta(String origem, String destino){
         adicionarVertice(origem);
         adicionarVertice(destino);
-        
         for (VerticeLista v : vertices) {
             if(v.getNome().equals(origem)){
                 v.ligacoes.add(destino);
@@ -92,7 +91,7 @@ public class GrafoListaAdjacencia extends Grafo{
             v.ligacoes.sort(null);
             for (String ligado : v.ligacoes) {
                 if(!verticesJaLidos.contains(ligado))
-                    saida += ("\n\t\""+v.getNome()+"\" -- \""+ligado+"\";");
+                    saida += ("\n    \""+v.getNome()+"\" -- \""+ligado+"\";");
             }
             verticesJaLidos.add(v.getNome());
         }
