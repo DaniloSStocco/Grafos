@@ -111,14 +111,12 @@ public class GrafoMatrizAdjacencia extends Grafo {
 
     @Override   
     public String toString() {
-        List<String> linhas = new ArrayList<>();
-        
-        // Array para rastrear quem tem pelo menos uma conexão
+        List<String> isolados = new ArrayList<>();
+        List<String> arestas = new ArrayList<>();
         boolean[] temAresta = new boolean[listaVertices.size()];
 
         for (int i = 0; i < matriz.size(); i++) {
             for (int j = i; j < matriz.get(i).size(); j++) {
-                
                 if (matriz.get(i).get(j) == 1) { 
                     temAresta[i] = true;
                     temAresta[j] = true;
@@ -126,35 +124,28 @@ public class GrafoMatrizAdjacencia extends Grafo {
                     String v1 = listaVertices.get(i);
                     String v2 = listaVertices.get(j);
                     
-                    // Ordena a dupla de vértices para ficar sempre "Menor" -- "Maior"
                     if (v1.compareTo(v2) > 0) {
-                        String temp = v1;
-                        v1 = v2;
-                        v2 = temp;
+                        String temp = v1; v1 = v2; v2 = temp;
                     }
-                    
-                    linhas.add("    \"" + v1 + "\" -- \"" + v2 + "\";");
+                    arestas.add("    \"" + v1 + "\" -- \"" + v2 + "\";");
                 }
             }
         }
         
-        // Verifica se sobrou algum vértice isolado (sem arestas)
         for (int i = 0; i < listaVertices.size(); i++) {
             if (!temAresta[i]) {
-                linhas.add("    \"" + listaVertices.get(i) + "\";");
+                isolados.add("    \"" + listaVertices.get(i) + "\";");
             }
         }
 
-        // Ordena o resultado alfabeticamente
-        Collections.sort(linhas);
+        Collections.sort(isolados);
+        Collections.sort(arestas);
 
-        // Constrói a saída final
         StringBuilder sb = new StringBuilder();
         sb.append("Matriz de Adjacencia\n");
         sb.append("graph {\n");
-        for (String linha : linhas) {
-            sb.append(linha).append("\n");
-        }
+        for (String iso : isolados) sb.append(iso).append("\n");
+        for (String aresta : arestas) sb.append(aresta).append("\n");
         sb.append("}\n");
         
         return sb.toString();

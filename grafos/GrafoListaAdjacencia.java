@@ -48,7 +48,7 @@ public class GrafoListaAdjacencia extends Grafo{
                 v.ligacoes.remove(destino);
             }
             if(v.getNome().equals(destino)){
-                v.ligacoes.remove(destino);
+                v.ligacoes.remove(origem);
                 nArestas--;
             }
         }
@@ -88,7 +88,13 @@ public class GrafoListaAdjacencia extends Grafo{
                        "graph {";
         this.vertices.sort(Comparator.comparing(VerticeLista::getNome));
         for (VerticeLista v : vertices) {
+            if(v.ligacoes.isEmpty()){
+                saida += "\n    \""+v.getNome()+"\";";
+            }
+        }
+        for (VerticeLista v : vertices) {
             v.ligacoes.sort(null);
+            
             for (String ligado : v.ligacoes) {
                 if(!verticesJaLidos.contains(ligado))
                     saida += ("\n    \""+v.getNome()+"\" -- \""+ligado+"\";");

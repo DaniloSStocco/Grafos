@@ -117,14 +117,13 @@ public class GrafoPonderadoMatrizAdjacencia extends Grafo {
 
     @Override   
     public String toString() {
-        List<String> linhas = new ArrayList<>();
+        List<String> isolados = new ArrayList<>();
+        List<String> arestas = new ArrayList<>();
         boolean[] temAresta = new boolean[listaVertices.size()];
 
         for (int i = 0; i < matriz.size(); i++) {
             for (int j = i; j < matriz.get(i).size(); j++) {
-                
                 int peso = matriz.get(i).get(j);
-                
                 if (peso != 0) { 
                     temAresta[i] = true;
                     temAresta[j] = true;
@@ -132,35 +131,28 @@ public class GrafoPonderadoMatrizAdjacencia extends Grafo {
                     String v1 = listaVertices.get(i);
                     String v2 = listaVertices.get(j);
                     
-                    // Ordena a dupla de vértices (Menor -- Maior)
                     if (v1.compareTo(v2) > 0) {
-                        String temp = v1;
-                        v1 = v2;
-                        v2 = temp;
+                        String temp = v1; v1 = v2; v2 = temp;
                     }
-                    
-                    linhas.add("    \"" + v1 + "\" -- \"" + v2 + "\" [label=\"" + peso + "\"];");
+                    arestas.add("    \"" + v1 + "\" -- \"" + v2 + "\" [label=\"" + peso + "\"];");
                 }
             }
         }
         
-        // Adiciona os vértices isolados
         for (int i = 0; i < listaVertices.size(); i++) {
             if (!temAresta[i]) {
-                linhas.add("    \"" + listaVertices.get(i) + "\";");
+                isolados.add("    \"" + listaVertices.get(i) + "\";");
             }
         }
 
-        // Ordena tudo alfabeticamente
-        Collections.sort(linhas);
+        Collections.sort(isolados);
+        Collections.sort(arestas);
 
-        // Monta o texto
         StringBuilder sb = new StringBuilder();
         sb.append("Ponderado - Matriz de Adjacencia\n");
         sb.append("graph {\n");
-        for (String linha : linhas) {
-            sb.append(linha).append("\n");
-        }
+        for (String iso : isolados) sb.append(iso).append("\n");
+        for (String aresta : arestas) sb.append(aresta).append("\n");
         sb.append("}\n");
         
         return sb.toString();
